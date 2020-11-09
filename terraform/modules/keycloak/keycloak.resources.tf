@@ -1,5 +1,5 @@
 resource "helm_release" "keycloak" {
-  name              = "service-reactor-keycloak"
+  name              = "keycloak"
   chart             = "./../../../helm-charts/charts/keycloak"
   namespace         = var.namespace
   dependency_update = true

@@ -10,6 +10,6 @@ variable "environment_tag" {
   default = "Local"
 }
 
-variable "eks_cluster_name" {
+variable "config_context" {
   default = "docker-desktop"
 }
