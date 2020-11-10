@@ -1,3 +1,22 @@
+
+resource "random_password" "keycloak-password" {
+  length = 16
+  special = true
+  override_special = "_%@"
+}
+
+resource "kubernetes_secret" "keycloak_user" {
+  metadata {
+    name = "keycloak-user"
+    namespace = var.namespace
+  }
+
+  data = {
+    KEYCLOAK_USER = "admin"
+    KEYCLOAK_PASSWORD = random_password.keycloak-password.result
+  }
+}
+
 resource "helm_release" "keycloak" {
   name              = "keycloak"
   chart             = "./../../../helm-charts/charts/keycloak"
@@ -16,11 +35,6 @@ resource "helm_release" "keycloak" {
   set {
     name  = "image.tag"
     value = ""
-  }
-
-  set {
-    name  = "service.port"
-    value = "8004"
   }
 
   set {
@@ -44,11 +58,6 @@ resource "helm_release" "keycloak" {
   }
 
   set {
-    name  = "external.enabled"
-    value = false
-  }
-
-  set {
     name  = "application"
     value = "keycloak"
   }
@@ -61,6 +70,14 @@ resource "helm_release" "keycloak" {
   set {
     name  = "environment"
     value = var.environment_name
+  }
+
+  set {
+    name = "extraEnvFrom"
+    value = <<EOF
+- secretRef:
+      name: 'keycloak-user'
+EOF
   }
 }
 
