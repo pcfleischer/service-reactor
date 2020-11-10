@@ -12,6 +12,10 @@ variable "requests_memory" {}
 
 variable "storage_class_name" {}
 
+variable "replicas" {
+  default = 3
+}
+
 variable "volume_storage" {
-    default = "30Gi"
+  default = "30Gi"
 }
