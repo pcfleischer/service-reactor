@@ -1,12 +1,14 @@
 resource "helm_release" "elasticsearch" {
-  name              = "service-reactor-elasticsearch"
-  chart             = "./../../../helm-charts/charts/elasticsearch"
+  name              = "elasticsearch"
+  repository        = "https://helm.elastic.co"
+  chart             = "elasticsearch"
   namespace         = var.namespace
   dependency_update = true
 
-  values = [
-    file("${path.module}/../../..//helm-charts/charts/elasticsearch/values.yaml"),
-  ]
+  set {
+    name  = "replicas"
+    value = var.replicas
+  }
 
   set {
     name  = "resources.limits.cpu"
@@ -29,18 +31,8 @@ resource "helm_release" "elasticsearch" {
   }
 
   set {
-    name  = "external.enabled"
-    value = false
-  }
-
-  set {
     name  = "application"
     value = "elasticsearch"
-  }
-
-  set {
-    name  = "costApplication"
-    value = "service-reactor"
   }
 
   set {
@@ -49,13 +41,12 @@ resource "helm_release" "elasticsearch" {
   }
 
   set {
-    name    = "volumeClaimTemplate.resources.requests.storage"
-    value   = var.volume_storage
+    name  = "volumeClaimTemplate.resources.requests.storage"
+    value = var.volume_storage
   }
 
   set {
-    name    = "volumeClaimTemplate.storageClassName"
-    value   = var.storage_class_name
+    name  = "volumeClaimTemplate.storageClassName"
+    value = var.storage_class_name
   }
 }
-
