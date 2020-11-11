@@ -1,5 +1,3 @@
-variable "namespace" {}
-
 variable "environment_name" {}
 
 variable "heap_options" {}

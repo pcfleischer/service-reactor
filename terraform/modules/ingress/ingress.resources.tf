@@ -1,12 +1,12 @@
 resource "kubernetes_ingress" "ingress" {
   metadata {
-    name      = "servicereactor-ingress"
+    name      = "${var.service_name}-ingress"
     namespace = var.namespace
 
     annotations = {
       "kubernetes.io/ingress.class"                = var.ingress_class
-      # "nginx.ingress.kubernetes.io/app-root" =  "/auth"
-      # "nginx.ingress.kubernetes.io/rewrite-target" = "/$1"
+      "nginx.ingress.kubernetes.io/app-root"       = var.app_root
+      "nginx.ingress.kubernetes.io/rewrite-target" = var.rewrite_target
     }
 
     labels = {

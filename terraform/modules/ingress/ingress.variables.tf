@@ -13,3 +13,11 @@ variable "ingress_class" {
 variable "path" {
   default = null
 }
+
+variable "app_root" {
+  default = null
+}
+
+variable "rewrite_target" {
+  default = null
+}
