@@ -6,12 +6,12 @@ module "keycloak-namespace" {
 
 module "keycloak-ingress" {
   source           = "../../modules/ingress"
+  name             = "keycloak"
   environment_name = var.environment_name
   namespace        = element([module.keycloak-namespace.output_name], 0)
   service_name     = "keycloak-http"
   service_port     = 80
   ingress_class    = "nginx"
-  path           = "/auth"
 }
 
 resource "random_password" "keycloak-password" {

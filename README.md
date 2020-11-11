@@ -70,17 +70,72 @@ kubectl get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.i
 
 ## Services
 
+### Nginx-Ingress
+
+The nginx ingress controller is an nginx container that handles all the routing for ingress to the services on the cluster.  It is like a managed nginx instance instead of manually installing and configuring nginx.  Using this controller is the preferred way of ingress site binding for location (hostname) and path based routing.
+
+`terraform apply --target module.ingress-nginx`
+
+https://kubernetes.github.io/ingress-nginx/examples/rewrite/
+
+https://kubernetes.github.io/ingress-nginx/deploy/
+
+
+#### Path Site Binding
+
+Browser apps may lack support for a "base url" for path based routing, this is because some resources may assume an absolute url for the host.
+
+For example, if you attempt to use path based routing for a ui like the below...
+http://local.servicereactor.io/admin/service-name/index.html
+
+Will proxy to the service succesfully...
+http://service-endpoint/index.html
+
+However the resources in the static pages may not be aware of the proxy path and the browser will be unable to find the resources
+Expected...
+```
+<script src="/admin/service-name/static/my-javascript.js"></script>
+```
+Actual...
+```
+<script src="/static/my-javascript.js"></script>
+```
+
+#### Location Site Binding
+
+The default ingress binding is to use the service name as a subdomain.  
+
+<service>.<environment>.servicereactor.io
+
+The service reactor domain for local has a wildcard subdomain fo
+
+*.local.servicereactor.io -> 127.0.0.1
+
+```
+╭─ ~/service-reactor/terraform/environments/local
+╰─± ping test12345.local.servicereactor.io
+PING test12345.local.servicereactor.io (127.0.0.1): 56 data bytes
+```
+
+Eventually we look to support a DNS provider (cloudflare, google, aws) and dynamic environments with tunnelling.
+
 ### Keycloak
 
 Keycloak is an identity and access management solution. 
 
 `terraform apply --target module.keycloak`
 
+For a list of helm variables, see the chart repository on codecentric github repository.
+
+https://github.com/codecentric/helm-charts/tree/master/charts/keycloak
+
+Eventually we will move postgres to its own chart to manage separately.
+
 #### Keycloak Ingress
 
-Using the nginx ingress all traffic to ${env}.servicereactor.io will be routed to keycloak.  Additional ingress hostname and path combinations will be used to support accessing multiple services.
+Using the nginx ingress all traffic to keycloak.${env}.servicereactor.io will be routed to keycloak.  Additional ingress hostname and path combinations will be used to support accessing multiple services.
 
-http://local.servicereactor.io/auth/
+http://keycloak.local.servicereactor.io/auth/
 
 The service can be accesed through a kubernetes proxy as well via: 
 http://localhost:8001/api/v1/namespaces/keycloak/services/keycloak-http:80/proxy/auth
@@ -99,7 +154,11 @@ kubectl get secret keycloak-user --namespace keycloak -o jsonpath='{.data.KEYCLO
 
 ### Prometheus
 
+http://prometheus.local.servicereactor.io/graph
+
 `terraform apply --target module.prometheus`
+
+https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus
 
 If you apply terraform, prometheus chart will be installed by default.  If you use a kubernetes client like lens you may need to reload the application to view metrics.
 
@@ -108,23 +167,17 @@ You can also directly access prometheus through a proxy or by setting up a port 
 kubectl --namespace=prometheus port-forward deploy/prometheus-server 9090
 ```
 
-### Nginx-Ingress
-
-`terraform apply --target module.ingress-nginx`
-
-The ingress is currently configured only to support the keycloak service.  When other services are added there will be more.
-
-https://kubernetes.github.io/ingress-nginx/examples/rewrite/
-
-https://kubernetes.github.io/ingress-nginx/deploy/
-
 ### ElasticSearch
 
 `terraform apply --target module.elasticsearch`
 
 ### Kibana
 
-`terraform apply --target module.ingress-nginx`
+http://kibana.local.servicereactor.io/app/home#/
+
+https://github.com/elastic/helm-charts/tree/master/kibana
+
+`terraform apply --target module.kibana`
 
 ## Networking
 

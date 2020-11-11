@@ -1,25 +1,18 @@
-module "kibana-namespace" {
-  source           = "../../modules/kubernetes-namespace"
-  environment_name = var.environment_name
-  name             = "kibana"
-}
-
 module "kibana-ingress" {
   source           = "../../modules/ingress"
+  name             = "kibana"
   environment_name = var.environment_name
-  namespace        = element([module.kibana-namespace.output_name], 0)
+  namespace        = var.namespace
   service_name     = "kibana-kibana"
   service_port     = 5601
   ingress_class    = "nginx"
-  path             = "/admin/kibana(/|$)(.*)"
-  rewrite_target = "/$2"
 }
 
 resource "helm_release" "kibana" {
   name              = "kibana"
   repository        = "https://helm.elastic.co"
   chart             = "kibana"
-  namespace         = element([module.kibana-namespace.output_name], 0)
+  namespace         = var.namespace
   dependency_update = true
 
   set {
