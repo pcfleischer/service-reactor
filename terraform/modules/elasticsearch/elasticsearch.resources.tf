@@ -1,8 +1,14 @@
+module "elasticsearch-namespace" {
+  source           = "../../modules/kubernetes-namespace"
+  environment_name = var.environment_name
+  name             = "elasticsearch"
+}
+
 resource "helm_release" "elasticsearch" {
   name              = "elasticsearch"
   repository        = "https://helm.elastic.co"
   chart             = "elasticsearch"
-  namespace         = var.namespace
+  namespace         = element([module.elasticsearch-namespace.output_name], 0)
   dependency_update = true
 
   set {

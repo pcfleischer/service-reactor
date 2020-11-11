@@ -1,31 +1,43 @@
+module "keycloak-namespace" {
+  source           = "../../modules/kubernetes-namespace"
+  environment_name = var.environment_name
+  name             = "keycloak"
+}
+
+module "keycloak-ingress" {
+  source           = "../../modules/ingress"
+  environment_name = var.environment_name
+  namespace        = element([module.keycloak-namespace.output_name], 0)
+  service_name     = "keycloak-http"
+  service_port     = 80
+  ingress_class    = "nginx"
+  path           = "/auth"
+}
 
 resource "random_password" "keycloak-password" {
-  length = 16
-  special = true
+  length           = 16
+  special          = true
   override_special = "_%@"
 }
 
 resource "kubernetes_secret" "keycloak_user" {
   metadata {
-    name = "keycloak-user"
-    namespace = var.namespace
+    name      = "keycloak-user"
+    namespace = element([module.keycloak-namespace.output_name], 0)
   }
 
   data = {
-    KEYCLOAK_USER = "admin"
+    KEYCLOAK_USER     = "admin"
     KEYCLOAK_PASSWORD = random_password.keycloak-password.result
   }
 }
 
 resource "helm_release" "keycloak" {
   name              = "keycloak"
-  chart             = "./../../../helm-charts/charts/keycloak"
-  namespace         = var.namespace
+  repository        = "https://codecentric.github.io/helm-charts"
+  chart             = "keycloak"
+  namespace         = element([module.keycloak-namespace.output_name], 0)
   dependency_update = true
-
-  values = [
-    file("${path.module}/../../..//helm-charts/charts/keycloak/values.yaml"),
-  ]
 
   set {
     name  = "image.repository"
@@ -73,7 +85,7 @@ resource "helm_release" "keycloak" {
   }
 
   set {
-    name = "extraEnvFrom"
+    name  = "extraEnvFrom"
     value = <<EOF
 - secretRef:
       name: 'keycloak-user'
