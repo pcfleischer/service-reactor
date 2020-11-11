@@ -6,13 +6,12 @@ module "prometheus-namespace" {
 
 module "prometheus-ingress" {
   source           = "../../modules/ingress"
+  name             = "prometheus"
   environment_name = var.environment_name
   namespace        = element([module.prometheus-namespace.output_name], 0)
   service_name     = "prometheus-server"
   service_port     = 80
   ingress_class    = "nginx"
-  path           = "/admin/prometheus(/|$)(.*)"
-  rewrite_target = "/$2"
 }
 
 resource "helm_release" "prometheus" {

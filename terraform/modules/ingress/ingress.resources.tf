@@ -1,6 +1,6 @@
 resource "kubernetes_ingress" "ingress" {
   metadata {
-    name      = "${var.service_name}-ingress"
+    name      = var.name
     namespace = var.namespace
 
     annotations = {
@@ -16,7 +16,7 @@ resource "kubernetes_ingress" "ingress" {
 
   spec {
     rule {
-      host = "${var.environment_name}.servicereactor.io"
+      host = "${var.name}.${var.environment_name}.servicereactor.io"
       http {
         path {
           path = var.path

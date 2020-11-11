@@ -56,3 +56,7 @@ resource "helm_release" "elasticsearch" {
     value = var.storage_class_name
   }
 }
+
+output "output_name" {
+  value = element([module.elasticsearch-namespace.output_name], 0)
+}

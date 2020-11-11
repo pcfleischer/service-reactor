@@ -1,3 +1,5 @@
+variable "namespace" {}
+
 variable "environment_name" {}
 
 variable "limit_cpu" {}
