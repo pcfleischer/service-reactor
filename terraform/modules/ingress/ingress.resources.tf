@@ -16,7 +16,7 @@ resource "kubernetes_ingress" "ingress" {
 
   spec {
     rule {
-      host = "${var.name}.${var.environment_name}.servicereactor.io"
+      host = "${var.subdomain}.${var.environment_name}.servicereactor.io"
       http {
         path {
           path = var.path

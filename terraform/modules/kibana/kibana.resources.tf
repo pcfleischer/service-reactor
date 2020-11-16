@@ -1,6 +1,7 @@
 module "kibana-ingress" {
   source           = "../../modules/ingress"
   name             = "kibana"
+  subdomain        = "kibana"
   environment_name = var.environment_name
   namespace        = var.namespace
   service_name     = "kibana-kibana"

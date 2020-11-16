@@ -1,5 +1,3 @@
 module "ingress-nginx" {
-  source           = "../../modules/ingress-nginx"
-  environment_name = var.environment_name
+  source = "../../modules/ingress-nginx"
 }
-
