@@ -7,6 +7,7 @@ module "prometheus-namespace" {
 module "prometheus-ingress" {
   source           = "../../modules/ingress"
   name             = "prometheus"
+  subdomain        = "metrics"
   environment_name = var.environment_name
   namespace        = element([module.prometheus-namespace.output_name], 0)
   service_name     = "prometheus-server"

@@ -7,7 +7,7 @@ variable "limit_cpu" {
 }
 
 variable "limit_memory" {
-  default = "2Gi"
+  default = "1Gi"
 }
 
 variable "requests_cpu" {
@@ -15,17 +15,5 @@ variable "requests_cpu" {
 }
 
 variable "requests_memory" {
-  default = "1Gi"
-}
-
-variable "storage_class_name" {
-  default = "hostpath"
-}
-
-variable "replicas" {
-  default = 1
-}
-
-variable "volume_storage" {
-  default = "10Gi"
+  default = "512Mi"
 }

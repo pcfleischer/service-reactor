@@ -7,6 +7,7 @@ module "keycloak-namespace" {
 module "keycloak-ingress" {
   source           = "../../modules/ingress"
   name             = "keycloak"
+  subdomain        = "keycloak"
   environment_name = var.environment_name
   namespace        = element([module.keycloak-namespace.output_name], 0)
   service_name     = "keycloak-http"
@@ -82,6 +83,18 @@ resource "helm_release" "keycloak" {
   set {
     name  = "environment"
     value = var.environment_name
+  }
+
+  set {
+    name  = "extraEnv"
+    value = <<EOF
+- name: JAVA_OPTS
+  value: >-
+    ${var.heap_options}
+    -Djava.net.preferIPv4Stack=true
+    -Djboss.modules.system.pkgs=$JBOSS_MODULES_SYSTEM_PKGS
+    -Djava.awt.headless=true
+EOF
   }
 
   set {
