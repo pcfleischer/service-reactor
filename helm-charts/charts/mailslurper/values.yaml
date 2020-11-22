@@ -70,11 +70,8 @@ tolerations: []
 
 affinity: {}
 
-server:
-  config:
-    path: /config.json
-    #/config.json
-    #/home/go/src/github.com/mailslurper/mailslurper/cmd/mailslurper/config.json
-    #/tmp/mailslurper/cmd/mailslurper/config.json
-    #/home/go/src/github.com/mailslurper/mailslurper/cmd/mailslurper/config.json
-    #/mailslurper/config.json
+# Add additional volumes, e. g. for custom config
+extraVolumes: ""
+
+# Add additional volumes mounts, e. g. for custom confg
+extraVolumeMounts: ""
