@@ -1,33 +1,3 @@
-module "mailslurper-namespace" {
-  source           = "../../modules/kubernetes-namespace"
-  environment_name = var.environment_name
-  name             = "mailslurper"
-}
-
-module "mailslurper-ingress" {
-  source           = "../../modules/ingress"
-  name             = "mailslurper"
-  subdomain        = "mailslurper"
-  environment_name = var.environment_name
-  namespace        = element([module.mailslurper-namespace.output_name], 0)
-  service_name     = "mailslurper"
-  service_port     = 8080
-  ingress_class    = "nginx"
-}
-
-module "mailslurper-api-ingress" {
-  source           = "../../modules/ingress"
-  name             = "mailslurper-api"
-  subdomain        = "mailslurper"
-  environment_name = var.environment_name
-  namespace        = element([module.mailslurper-namespace.output_name], 0)
-  service_name     = "mailslurper"
-  service_port     = 8888
-  ingress_class    = "nginx"
-  path             = "/api(/|$)(.*)"
-  rewrite_target   = "/$2"
-}
-
 resource "helm_release" "mailslurper" {
   name      = "mailslurper"
   chart     = "./../../../helm-charts/charts/mailslurper"
@@ -80,5 +50,23 @@ resource "helm_release" "mailslurper" {
   set {
     name  = "environment"
     value = var.environment_name
+  }
+
+  set {
+    name  = "extraVolumes"
+    value = <<EOF
+- name: config-volume
+  configMap:
+    name: config-json
+EOF
+  }
+
+  set {
+    name  = "extraVolumeMounts"
+    value = <<EOF
+- name: config-volume
+  mountPath: "/config.json"
+  subPath: "config.json"
+EOF
   }
 }
