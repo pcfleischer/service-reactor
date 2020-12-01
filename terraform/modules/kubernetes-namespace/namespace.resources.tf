@@ -14,5 +14,5 @@ resource "kubernetes_namespace" "namespace" {
 }
 
 output "output_name" {
-  value = var.name
+  value = kubernetes_namespace.namespace.metadata[0].name
 }

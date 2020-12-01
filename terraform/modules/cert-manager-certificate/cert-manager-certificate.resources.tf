@@ -25,7 +25,3 @@ resource "helm_release" "cert-manager-certificate" {
     value = var.issuer_name
   }
 }
-
-output "output_name" {
-  value = var.name
-}
