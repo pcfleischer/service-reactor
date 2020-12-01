@@ -1,4 +1,4 @@
 module "fluentd" {
-  source           = "../../modules/fluentd"
-  environment_name = var.environment_name
+  source    = "../../modules/fluentd"
+  namespace = element([module.service-namespace.output_name], 0)
 }

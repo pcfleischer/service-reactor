@@ -1,7 +1,7 @@
 resource "helm_release" "mailslurper" {
   name      = "mailslurper"
   chart     = "./../../../helm-charts/charts/mailslurper"
-  namespace = element([module.mailslurper-namespace.output_name], 0)
+  namespace = var.namespace
 
   values = [
     file("${path.module}/../../../helm-charts/charts/mailslurper/values.yaml"),

@@ -1,14 +1,8 @@
-module "fluentd-namespace" {
-  source           = "../../modules/kubernetes-namespace"
-  environment_name = var.environment_name
-  name             = "fluentd"
-}
-
 resource "helm_release" "fluentd" {
   name              = "fluentd"
   repository        = "https://kokuwaio.github.io/helm-charts"
   chart             = "fluentd-elasticsearch"
-  namespace         = element([module.fluentd-namespace.output_name], 0)
+  namespace         = var.namespace
   dependency_update = true
 
   set {
@@ -28,7 +22,7 @@ resource "helm_release" "fluentd" {
 
   set {
     name  = "elasticsearch.hosts"
-    value = "elasticsearch-master.elasticsearch.svc.cluster.local:9200"
+    value = "elasticsearch-master.${var.namespace}.svc.cluster.local:9200"
   }
 
 }

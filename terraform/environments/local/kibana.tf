@@ -1,4 +1,4 @@
 module "kibana" {
   source    = "../../modules/kibana"
-  namespace = element([module.elasticsearch.output_name], 0)
+  namespace = element([module.service-namespace.output_name], 0)
 }

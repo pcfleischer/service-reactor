@@ -9,7 +9,7 @@ variable "limit_cpu" {
 }
 
 variable "limit_memory" {
-  default = "1Gi"
+  default = "1.2Gi"
 }
 
 variable "requests_cpu" {
@@ -17,5 +17,5 @@ variable "requests_cpu" {
 }
 
 variable "requests_memory" {
-  default = "500Mi"
+  default = "640Mi"
 }
