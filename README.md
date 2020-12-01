@@ -45,7 +45,7 @@ While the goal of this project is to target any kubernetes provider, the quickes
 
 https://docs.docker.com/docker-for-mac/kubernetes/
 
-## Kubernetes Management
+### Kubernetes Management
 
 If you use lens, you're in luck, just sit back and enjoy features like...
 - clicking on service to open browser with proxy
@@ -68,11 +68,18 @@ http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kube
 kubectl get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.token}"| base64 --decode
 ```
 
+## Namespaces
+
+The goal of ServiceReactor namespace strategy is to eventually allow ephemeral environments to be created within shared cluster for continuous integration and delivery.
+
+It is also worth noting there are several challenges with working across namespaces for networking (ingress, certificate binding)
+
 ## Services
 
-### Nginx-Ingress
+### Kubernetes Ingress Controller
 
-The nginx ingress controller is an nginx container that handles all the routing for ingress to the services on the cluster.  It is like a managed nginx instance instead of manually installing and configuring nginx.  Using this controller is the preferred way of ingress site binding for location (hostname) and path based routing.
+The kbernetes ingress controller is distribution of an nginx container that handles all the routing for ingress to the services on the cluster.  It is like a managed nginx instance instead of manually installing and configuring nginx.  Using this controller is the preferred way of ingress site binding for location (hostname) and path based routing.
+
 
 `terraform apply --target module.ingress-nginx`
 
@@ -80,6 +87,9 @@ https://kubernetes.github.io/ingress-nginx/examples/rewrite/
 
 https://kubernetes.github.io/ingress-nginx/deploy/
 
+When working with this controller it is important to not confuse the kubernetes ingress controller with the nginx commercial ingress controller.  There are variety of options for ingress that offer many features that are worth checking out:
+
+https://medium.com/flant-com/comparing-ingress-controllers-for-kubernetes-9b397483b46b
 
 #### Path Site Binding
 
@@ -154,6 +164,8 @@ kubectl get secret keycloak-user --namespace keycloak -o jsonpath='{.data.KEYCLO
 
 ### Prometheus
 
+Prometheus collects kubernetes metrics for the cluster, this allows users to view cpu and memory usage in tools like lens.
+
 http://prometheus.local.servicereactor.io/graph
 
 `terraform apply --target module.prometheus`
@@ -181,10 +193,69 @@ https://github.com/elastic/helm-charts/tree/master/kibana
 
 ## Networking
 
-TODO: allow external tunnels to local instance 
+### DNS
+
+ServiceReactor is currently using externally mangaged Cloudflare to control domain servicereactor.io.  This is being currently managed by Terraform from a separate repository for security reasons.
+
+A wildcard subdomain is being used for local and sandbox environments.
+
+
+> *.local.servicereactor.io -> 127.0.0.1
+> 
+> *.sandbox.servicereactor.io -> google cloud
+
+### TLS
+
+In order to easily setup TLS, a cert-manager controller module is included.  This is currently setup to more easily manage certificate creating and binding to ingress controllers.
+
+The terraform modules produce a wildcard default certificate for the environment/namespace.  This allows to easily add new service ingresses by subdomain without having to generate new certificates.
+
+`*.${environment}.servicereactor.io`
+
+For local and ephemeral environments, these will be self-signed certificates, you can trust them:
+
+***Mac:***
+```bash
+# view the public key
+openssl s_client -showcerts -connect local.servicereactor.io:443 </dev/null
+# output public key to file
+openssl s_client -showcerts -connect local.servicereactor.io:443 </dev/null 2>/dev/null | openssl x509 -outform PEM > local-servicereactor-io.pem
+
+# optional: attempt to delete old versions
+# sudo security remove-trusted-cert -d local-servicereactor-io.pem
+# sudo security delete-certificate -c local.servicereactor.io
+
+# add public key to 
+sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain local-servicereactor-io.pem
+```
+
+***Browsers***
+
+Some browsers have varying policies on certificate management, firefox for example requires a configuration to be set to allow the browser to use the OS system settings for certificate trusts instead of its internal store.
+
+Firefox: https://support.mozilla.org/bm/questions/1175296
+
+`security.enterprise_roots.enabled` on the `about:config` page
+
+### Tunneling
+
+TODO:
+* explore allowing ngrok or argo tunnels to local ephemeral machines
+* explore ingress "external-dns" to automatically manage dns creation and mapping
 
 ### cloudflare / ngrok
 
 https://developers.cloudflare.com/argo-tunnel/
 
 brew install cloudflare/cloudflare/cloudflared
+
+## Troubleshooting
+
+* Docker Desktop Kubernetes - stuck "Starting"
+
+Issue: https://github.com/docker/for-mac/issues/3649 has a workaround, but the result is the kubernetes is basically "reset", use with caution.
+> Deleting the PKI folder (~/Library/Group Containers/group.com.docker/pki)
+
+## Knnown Issues
+
+* Dependencies on clean kubernetes

@@ -1,3 +1,5 @@
+variable "namespace" {}
+
 variable "environment_name" {
   default = "local"
 }
@@ -7,7 +9,7 @@ variable "limit_cpu" {
 }
 
 variable "limit_memory" {
-  default = "2Gi"
+  default = "3Gi"
 }
 
 variable "requests_cpu" {
@@ -15,7 +17,7 @@ variable "requests_cpu" {
 }
 
 variable "requests_memory" {
-  default = "1Gi"
+  default = "1.5Gi"
 }
 
 variable "storage_class_name" {

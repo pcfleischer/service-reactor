@@ -1,3 +1,3 @@
 module "keycloak" {
-  source           = "../../modules/keycloak"
+  source = "../../modules/keycloak"
 }
