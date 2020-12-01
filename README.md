@@ -70,7 +70,7 @@ kubectl get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.i
 
 ## Namespaces
 
-The goal of ServiceReactor namespace strategy is to eventaully allow ephemeral environments to be created within shared cluster for continuous integration and delivery.
+The goal of ServiceReactor namespace strategy is to eventually allow ephemeral environments to be created within shared cluster for continuous integration and delivery.
 
 It is also worth noting there are several challenges with working across namespaces for networking (ingress, certificate binding)
 
